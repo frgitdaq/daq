@@ -32,6 +32,9 @@
     },
     "network": {
       "enabled": true
+    },
+    "dhcp": {
+      "enabled": true
     }
   }
 }

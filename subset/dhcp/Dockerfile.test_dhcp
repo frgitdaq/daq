@@ -1,0 +1,11 @@
+FROM daqf/aardvark:latest
+
+RUN $AG update && $AG install python-setuptools python-pip
+
+RUN pip install protobuf
+
+COPY libs/proto/* ./
+COPY subset/dhcp/dhcp_tests.py .
+COPY subset/dhcp/test_dhcp .
+
+CMD ["./test_dhcp"]

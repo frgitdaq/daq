@@ -8,6 +8,8 @@ MONITOR=/scans/monitor.pcap
 # General Network Tests
 python network_tests.py connection.min_send $MONITOR $TARGET_IP
 python network_tests.py communication.type.broadcast $MONITOR $TARGET_IP
+python network_tests.py connection.network.ipv6_support $STARTUP $TARGET_MAC
+python network_tests.py connection.network.ipv6_slaac $STARTUP $TARGET_MAC
 
 cat network_tests.txt >> $REPORT
 

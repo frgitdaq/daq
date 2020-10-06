@@ -14,6 +14,8 @@ import subprocess, time, sys, json
 import re
 import datetime
 
+from scapy.all import rdpcap, IPv6, DHCP6, ICMPv6ND_RA
+
 arguments = sys.argv
 
 test_request = str(arguments[1])
@@ -31,6 +33,8 @@ dash_break_line = '--------------------\n'
 
 description_min_send = 'Device sends data at a frequency of less than 5 minutes.'
 description_communication_type = 'Device sends unicast or broadcast packets.'
+description_ipv6_support = 'Device supports IPv6.'
+description_ipv6_slaac = 'Device supports IPv6 SLAAC.'
 
 tcpdump_display_all_packets = 'tcpdump -tttt -n src host ' + device_address + ' -r ' + cap_pcap_file
 tcpdump_display_udp_bacnet_packets = 'tcpdump -n udp dst portrange 47808-47809 -r ' + cap_pcap_file
@@ -208,6 +212,26 @@ def test_communication_type_broadcast():
 
     return 'info'
 
+def test_ipv6_support():
+    
+    packets = rdpcap(cap_pcap_file)
+    for packet in packets:
+        if packet.src == device_address and (IPv6 in packet or DHCP6 in packet):
+            add_summary("Device supports IPv6.")
+            return 'pass'
+    add_summary("Device does not support IPv6.")
+    return 'fail'
+
+def test_ipv6_slaac():
+    
+    packets = rdpcap(cap_pcap_file)
+    for packet in packets:
+        if packet.src == device_address and ICMPv6ND_RA in packet and packet[ICMPv6ND_RA].M == 0 and packet[ICMPv6ND_RA].O == 0:
+            add_summary("Device supports IPv6 SLAAC.")
+            return 'pass'
+    add_summary("Device does not support IPv6 SLAAC.")
+    return 'fail'
+
 
 write_report("{b}{t}\n{b}".format(b=dash_break_line, t=test_request))
 
@@ -217,5 +241,11 @@ if test_request == 'connection.min_send':
 elif test_request == 'communication.type.broadcast':
     write_report("{d}\n{b}".format(b=dash_break_line, d=description_communication_type))
     result = test_communication_type_broadcast()
+elif test_request == 'connection.network.ipv6_support':
+    write_report("{d}\n{b}".format(b=dash_break_line, d=description_ipv6_support))
+    result = test_ipv6_support()
+elif test_request == 'connection.network.ipv6_slaac':
+    write_report("{d}\n{b}".format(b=dash_break_line, d=description_ipv6_slaac))
+    result = test_ipv6_slaac()
 
 write_report("RESULT {r} {t} {s}\n".format(r=result, t=test_request, s=summary_text.strip()))

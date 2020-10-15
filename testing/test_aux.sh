@@ -67,7 +67,7 @@ interfaces:
   faux-1:
     opts: brute broadcast_client ntpv4
   faux-2:
-    opts: nobrute expiredtls bacnetfail pubber passwordfail ntpv3 opendns ssh curl
+    opts: nobrute expiredtls bacnetfail pubber passwordfail ntpv3 opendns no_mdns ssh curl
   faux-3:
     opts: tls macoui passwordpass bacnet pubber broadcast_client ssh curl
 long_dhcp_response_sec: 0

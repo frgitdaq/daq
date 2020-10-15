@@ -3,6 +3,7 @@
 
 """
 from __future__ import absolute_import
+from scapy.all import rdpcap, UDP, DNS
 import subprocess
 import sys
 
@@ -12,12 +13,18 @@ import datetime
 arguments = sys.argv
 
 test_request = str(arguments[1])
-cap_pcap_file = str(arguments[2])
-device_address = str(arguments[3])
+if test_request == 'connection.dns.mdns':
+    startup_pcap = str(arguments[2])
+    monitor_pcap = str(arguments[3])
+    device_address = str(arguments[4])
+else:
+    cap_pcap_file = str(arguments[2])
+    device_address = str(arguments[3])
 
 report_filename = 'dns_tests.txt'
 min_packet_length_bytes = 20
 max_packets_in_report = 10
+mdns_port = 5353
 port_list = []
 ignore = '%%'
 summary_text = ''
@@ -25,6 +32,7 @@ result = 'fail'
 dash_break_line = '--------------------\n'
 
 DESCRIPTION_HOSTNAME_CONNECT = 'Check device uses the DNS server from DHCP and resolves hostnames'
+DESCRIPTION_MULTICAST_DNS = 'Check device uses multicast DNS'
 
 TCPDUMP_DATE_FORMAT = "%Y-%m-%d %H:%M:%S.%f"
 
@@ -173,11 +181,25 @@ def test_dns(target_ip):
     add_summary('Device did not send data to IP addresses retrieved from the DNS server')
     return 'fail'
 
+def test_mdns():
+    capture = rdpcap(startup_pcap)
+    capture.extend(rdpcap(monitor_pcap))
+    for packet in capture:
+        if DNS in packet and packet[UDP].sport == mdns_port: 
+            if packet.src == device_address:
+                add_summary('Device uses MDNS')
+                return 'pass'
+    add_summary('Device does not use MDNS')
+    return 'pass'
+
 
 write_report("{b}{t}\n{b}".format(b=dash_break_line, t=test_request))
 
 if test_request == 'connection.dns.hostname_connect':
     write_report("{d}\n{b}".format(b=dash_break_line, d=DESCRIPTION_HOSTNAME_CONNECT))
     result = test_dns(device_address)
+elif test_request == 'connection.dns.mdns':
+    write_report("{d}\n{b}".format(b=dash_break_line, d=DESCRIPTION_MULTICAST_DNS))
+    result = test_mdns()
 
 write_report("RESULT {r} {t} {s}\n".format(r=result, t=test_request, s=summary_text.strip()))

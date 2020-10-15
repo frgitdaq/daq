@@ -34,7 +34,9 @@ FROM daqf/aardvark:latest
 RUN $AG update && $AG install openjdk-8-jre
 RUN $AG update && $AG install openjdk-8-jdk git
 RUN $AG update && $AG install isc-dhcp-client ethtool network-manager netcat curl\
-    python ifupdown openssl nano apache2-utils ntpdate vzctl
+    python python-setuptools python-pip ifupdown openssl nano apache2-utils ntpdate vzctl
+
+RUN pip install scapy
 
 # Additional OS dependencies
 RUN $AG update && $AG install -y telnetd && $AG install xinetd nginx
@@ -42,6 +44,7 @@ RUN $AG update && $AG install -y telnetd && $AG install xinetd nginx
 COPY docker/include/network/NTPClient NTPClient
 RUN cd NTPClient && ./gradlew build
 COPY docker/include/network/TransportClient TransportClient
+COPY docker/include/network/DNSClient DNSClient
 
 # Prefetch resolvconf to dynamically install at runtime in start_faux.
 RUN $AG update && cd /tmp && ln -s ~/bin bin && $AG download resolvconf && mv resolvconf_*.deb ~

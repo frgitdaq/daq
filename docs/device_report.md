@@ -56,7 +56,7 @@ Overall device result FAIL
 |---|---|---|---|---|---|
 |Required|1|0|0|0|0|
 |Recommended|1|0|0|0|1|
-|Other|6|2|21|1|2|
+|Other|7|2|21|1|2|
 
 |Result|Test|Category|Expectation|Notes|
 |---|---|---|---|---|
@@ -70,6 +70,7 @@ Overall device result FAIL
 |info|communication.type.broadcast|Other|Other|Broadcast packets received. Unicast packets received.|
 |skip|connection.dns.hostname_connect|Other|Other|Device did not send any DNS requests|
 |fail|connection.mac_oui|Other|Other|Manufacturer prefix not found!|
+|pass|connection.dns.mdns|Other|Other|Device uses MDNS|
 |pass|connection.min_send|Other|Other|ARP packets received. Data packets were sent at a frequency of less than 5 minutes|
 |pass|connection.network.ntp_support|Other|Other|Using NTPv4.|
 |pass|connection.network.ntp_update|Other|Other|Device clock synchronized.|
@@ -605,6 +606,12 @@ connection.dns.hostname_connect
 Check device uses the DNS server from DHCP and resolves hostnames
 --------------------
 RESULT skip connection.dns.hostname_connect Device did not send any DNS requests
+--------------------
+connection.dns.mdns
+--------------------
+Check device uses multicast DNS
+--------------------
+RESULT pass connection.dns.mdns Device uses MDNS
 ```
 
 #### Module Config

@@ -146,6 +146,17 @@ elif [ -n "${options[sshv1]}" ]; then
     /usr/local/sbin/sshd
 fi
 
+if [ -n "${options[no_mdns]}" ]; then
+    echo Disabling MDNS...
+    ufw deny out 5353/udp
+else
+    (while true; do 
+        echo Sending MDNS query
+        python DNSClient/dns_client.py send-mdns google.com
+        sleep 10
+    done) &
+fi
+
 if [ -n "${options[bacnet]}" ]; then
     echo Starting bacnet loop device.
     java -cp bacnetFaux/build/libs/bacnet-1.0-SNAPSHOT-all.jar \

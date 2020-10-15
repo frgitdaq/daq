@@ -4,7 +4,7 @@
 .build_files
 .build_built
 .project
-
+.idea/
 daq-*.tar.bz2
 
 protoc-gen-doc/

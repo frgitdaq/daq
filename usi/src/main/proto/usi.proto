@@ -13,6 +13,7 @@ service USIService {
   rpc GetInterface(SwitchInfo) returns (InterfaceResponse) {}
   rpc disconnect(SwitchInfo) returns (SwitchActionResponse) {}
   rpc connect(SwitchInfo) returns (SwitchActionResponse) {}
+  rpc SetSpeed(SpeedInfo) returns (SwitchActionResponse) {}
 }
 
 message SwitchActionResponse {
@@ -93,4 +94,9 @@ message SwitchInfo {
 
   // Switch connect password
   string password = 6;
+}
+
+message SpeedInfo {
+  SwitchInfo switchInfo = 2;
+  int32 speed = 1;
 }

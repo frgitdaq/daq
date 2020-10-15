@@ -4,9 +4,9 @@
 .build_files
 .build_built
 .project
-
+.idea/
 daq-*.tar.bz2
-
+*.iml
 protoc-gen-doc/
 
 firebase/public/firebase_config.js

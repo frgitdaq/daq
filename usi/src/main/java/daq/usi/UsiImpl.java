@@ -3,11 +3,7 @@ package daq.usi;
 import daq.usi.allied.AlliedTelesisX230;
 import daq.usi.cisco.Cisco9300;
 import daq.usi.ovs.OpenVSwitch;
-import grpc.InterfaceResponse;
-import grpc.PowerResponse;
-import grpc.SwitchActionResponse;
-import grpc.SwitchInfo;
-import grpc.USIServiceGrpc;
+import grpc.*;
 import io.grpc.stub.StreamObserver;
 import java.util.HashMap;
 import java.util.Map;
@@ -134,4 +130,24 @@ public class UsiImpl extends USIServiceGrpc.USIServiceImplBase {
       responseObserver.onError(e);
     }
   }
+
+  @Override
+  public void setSpeed(SpeedInfo request, StreamObserver<SwitchActionResponse> responseObserver) {
+    System.out.println("Received request in set speed");
+    SwitchController sc = getSwitchController(request.getSwitchInfo());
+    try {
+      sc.setSpeed(request.getSwitchInfo().getDevicePort(), request.getSpeed(), data -> {
+        System.out.println("Sent response in set speed");
+        if (debug) {
+          System.out.println(data);
+        }
+        responseObserver.onNext(data);
+        responseObserver.onCompleted();
+      });
+    } catch (Exception e) {
+      e.printStackTrace();
+      responseObserver.onError(e);
+    }
+  }
+
 }

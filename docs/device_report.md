@@ -67,10 +67,10 @@ Overall device result FAIL
 |skip|cloud.udmi.provision|Other|Other|No device id|
 |skip|cloud.udmi.state|Other|Other|No device id|
 |skip|cloud.udmi.system|Other|Other|No device id|
-|info|communication.type.broadcast|Other|Other|Broadcast packets received. Unicast packets received.|
+|info|communication.type.broadcast|Other|Other|Broadcast packets received. Multicast packets received. Unicast packets received.|
 |skip|connection.dns.hostname_connect|Other|Other|Device did not send any DNS requests|
-|fail|connection.mac_oui|Other|Other|Manufacturer prefix not found!|
 |pass|connection.dns.mdns|Other|Other|Device uses MDNS|
+|fail|connection.mac_oui|Other|Other|Manufacturer prefix not found!|
 |pass|connection.min_send|Other|Other|ARP packets received. Data packets were sent at a frequency of less than 5 minutes|
 |pass|connection.network.ntp_support|Other|Other|Using NTPv4.|
 |pass|connection.network.ntp_update|Other|Other|Device clock synchronized.|
@@ -577,7 +577,7 @@ Device sends unicast or broadcast packets.
 --------------------
 
 
-RESULT info communication.type.broadcast Broadcast packets received. Unicast packets received.
+RESULT info communication.type.broadcast Broadcast packets received. Multicast packets received. Unicast packets received.
 --------------------
 connection.network.ntp_support
 --------------------

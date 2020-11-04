@@ -171,7 +171,6 @@ public class SwitchTest {
     int[] speeds = new int[]{100, 1000, -1};
 
     for (int speed : speeds) {
-
       SpeedInfo speedInfo = SpeedInfo.newBuilder()
               .setSwitchInfo(switchInfo)
               .setSpeed(speed).build();

@@ -5,6 +5,7 @@ import grpc.LinkStatus;
 import grpc.POENegotiation;
 import grpc.POEStatus;
 import grpc.POESupport;
+import grpc.SwitchActionResponse;
 import grpc.PowerResponse;
 import grpc.SwitchInfo;
 import grpc.SpeedInfo;
@@ -167,16 +168,27 @@ public class SwitchTest {
     results.add(powerResponse.getRawOutput());
     testLink(interfaceResponse);
 
-    int[] speeds = new int[]{-1, 100, 1000};
+    int[] speeds = new int[]{100, 1000, -1};
 
     for (int speed : speeds) {
+
       SpeedInfo speedInfo = SpeedInfo.newBuilder()
               .setSwitchInfo(switchInfo)
               .setSpeed(speed).build();
+
       SwitchActionResponse setSpeedResponse = blockingStub
               .withDeadlineAfter(rpcTimeoutSec, TimeUnit.SECONDS).setSpeed(speedInfo);
+
+      // Allow time to reconnect
+      try {
+        Thread.sleep(5000);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
       InterfaceResponse setSpeedStatus = blockingStub
               .withDeadlineAfter(rpcTimeoutSec, TimeUnit.SECONDS).getInterface(switchInfo);
+      results.add(setSpeedStatus.getRawOutput());
       testSpeed(speed, setSpeedResponse, setSpeedStatus);
     }
 

@@ -97,6 +97,9 @@ message SwitchInfo {
 }
 
 message SpeedInfo {
+  // Switch connection parameters
   SwitchInfo switchInfo = 2;
+
+  // Speed to set port to in megabits
   int32 speed = 1;
 }

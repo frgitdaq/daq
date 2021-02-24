@@ -2,6 +2,7 @@
 
 REPORT=/tmp/report.txt
 
+STARTUP=/scans/startup.pcap
 MONITOR=/scans/monitor.pcap
 
 # General Network Tests
@@ -21,5 +22,6 @@ cat ntp_tests.txt >> $REPORT
 
 # DNS Tests
 python dns_tests.py dns.network.hostname_resolution $MONITOR $TARGET_IP
+python dns_tests.py dns.network.multicast_dns $STARTUP $MONITOR $TARGET_MAC
 
 cat dns_tests.txt >> $REPORT

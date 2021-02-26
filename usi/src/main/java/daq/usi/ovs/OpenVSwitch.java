@@ -83,6 +83,12 @@ public class OpenVSwitch implements SwitchController {
     managePort(devicePort, handler, false);
   }
 
+  @Override
+  public void setSpeed(int devicePort, int speed, ResponseHandler<SwitchActionResponse> handler) throws Exception {
+
+
+  }
+
   public void start() {
   }
 }

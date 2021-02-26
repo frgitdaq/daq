@@ -17,5 +17,8 @@ public interface SwitchController {
   void disconnect(int devicePort, ResponseHandler<SwitchActionResponse> handler)
       throws Exception;
 
+  void setSpeed(int devicePort, int speed, ResponseHandler<SwitchActionResponse> handler)
+      throws Exception;
+
   void start();
 }

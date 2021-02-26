@@ -13,6 +13,7 @@ service USIService {
   rpc GetInterface(SwitchInfo) returns (InterfaceResponse) {}
   rpc disconnect(SwitchInfo) returns (SwitchActionResponse) {}
   rpc connect(SwitchInfo) returns (SwitchActionResponse) {}
+  rpc setSpeed(SpeedInfo) returns (SwitchActionResponse) {}
 }
 
 message SwitchActionResponse {
@@ -26,6 +27,11 @@ message PowerResponse {
   POEStatus.State poe_status = 4;
   POENegotiation.State poe_negotiation = 5;
   string raw_output = 6;
+}
+
+message SpeedInfo {
+  SwitchInfo switchInfo = 2;
+  int32 speed = 1;
 }
 
 message InterfaceResponse {

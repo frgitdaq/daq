@@ -5,8 +5,10 @@ import grpc.LinkStatus;
 import grpc.POENegotiation;
 import grpc.POEStatus;
 import grpc.POESupport;
+import grpc.SwitchActionResponse;
 import grpc.PowerResponse;
 import grpc.SwitchInfo;
+import grpc.SpeedInfo;
 import grpc.USIServiceGrpc;
 import io.grpc.Channel;
 import java.io.BufferedWriter;
@@ -60,19 +62,35 @@ public class SwitchTest {
     }
   }
 
-  protected void testSpeed(InterfaceResponse interfaceResponse) {
-    final String testName = "connection.switch.port_speed";
-    int linkSpeed = interfaceResponse.getLinkSpeed();
-    if (linkSpeed > 0) {
-      if (linkSpeed >= 10) {
-        captureResult(testName, Result.PASS,
-            "Speed auto-negotiated successfully. Speed is greater than 10 MBPS");
+  protected void testSpeed(int speed, SwitchActionResponse success, InterfaceResponse interfaceResponse) {
+    if (speed == -1) {
+      String testName = "connection.switch.port_speed";
+      int linkSpeed = interfaceResponse.getLinkSpeed();
+      if (linkSpeed > 0) {
+        if (linkSpeed >= 10) {
+          captureResult(testName, Result.PASS,
+                  "Speed auto-negotiated successfully. Speed is greater than 10 MBPS");
+        } else {
+          captureResult(testName, Result.FAIL,
+                  "Speed is too slow. Speed is less than or equal to 10 mbps");
+        }
       } else {
-        captureResult(testName, Result.FAIL,
-            "Speed is too slow. Speed is less than or equal to 10 mbps");
+        captureResult(testName, Result.FAIL, "Cannot detect current speed");
       }
-    } else {
-      captureResult(testName, Result.FAIL, "Cannot detect current speed");
+    }
+    else {
+      String testName = "";
+      if (speed == 100) {
+        testName = "connection.switch.port_meg";
+      } else if (speed == 1000) {
+        testName = "connection.switch.port_gig";
+      }
+      if (interfaceResponse.getLinkStatus() == LinkStatus.State.UP) {
+        captureResult(testName, Result.PASS, "Device supports " + speed + "M port speed");
+      }
+      else {
+        captureResult(testName, Result.FAIL, "Device does not support " + speed + "M port speed");
+      }
     }
   }
 
@@ -148,10 +166,33 @@ public class SwitchTest {
     results.add(interfaceResponse.getRawOutput());
     results.add(powerResponse.getRawOutput());
     testLink(interfaceResponse);
-    testSpeed(interfaceResponse);
+    
+    int[] speeds = new int[]{100, 1000, -1};
+
+    for (int speed : speeds) {
+      SpeedInfo speedInfo = SpeedInfo.newBuilder()
+              .setSwitchInfo(switchInfo)
+              .setSpeed(speed).build();
+      SwitchActionResponse setSpeedResponse = blockingStub
+              .withDeadlineAfter(rpcTimeoutSec, TimeUnit.SECONDS).setSpeed(speedInfo);
+
+      try {
+        Thread.sleep(3000);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+
+      InterfaceResponse setSpeedStatus = blockingStub
+              .withDeadlineAfter(rpcTimeoutSec, TimeUnit.SECONDS).getInterface(switchInfo);
+      results.add(setSpeedStatus.getRawOutput());
+      testSpeed(speed, setSpeedResponse, setSpeedStatus);
+
+    }
+
     testDuplex(interfaceResponse);
     testPower(powerResponse);
     writeReport();
+
   }
 }
 

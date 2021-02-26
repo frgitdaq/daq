@@ -5,6 +5,12 @@
     "connection.switch.port_speed" : {
         "description" : "Verify the device auto-negotiates connection speed"
     },
+    "connection.switch.port_meg" : {
+        "description" : "Verify the device supports 100meg connection speed"
+    },
+    "connection.switch.port_gig" : {
+        "description" : "Verify the device supports 1gig connection speed"
+    },
     "connection.switch.port_duplex" : {
         "description" : "Verify the device supports full duplex"
     },

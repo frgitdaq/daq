@@ -96,12 +96,29 @@ public class Cisco9300 extends BaseSwitchController {
    * @param enabled       for bringing up/down interfacePort
    * @return commands
    */
-  private String[] portManagementCommand(int interfacePort, boolean enabled) {
+  private String[] portToggleCommand(int interfacePort, boolean enabled) {
     return new String[] {
         "configure terminal",
         "interface gigabitethernet1/0/" + interfacePort,
         (enabled ? "no " : "") + "shutdown",
         "end"
+    };
+  }
+
+  /**
+   * Set port speed commands.
+   *
+   * @param interfacePort port number
+   * @param speed in bytes
+   * @return commands
+   */
+
+  private String[] portSpeedCommand(int interfacePort, String speed) {
+    return new String[] {
+      "configure terminal",
+      "interface gigabitethernet1/0/" + interfacePort,
+      "speed " + speed,
+      "end" 
     };
   }
 
@@ -201,13 +218,10 @@ public class Cisco9300 extends BaseSwitchController {
     }
   }
 
-  private void managePort(int devicePort, ResponseHandler<SwitchActionResponse> handler,
-                          boolean enabled) throws Exception {
+  private void managePort(int devicePort, Queue<String> commands, ResponseHandler<SwitchActionResponse> handler) throws Exception {
     while (commandPending) {
       Thread.sleep(WAIT_MS);
     }
-    Queue<String> commands =
-        new LinkedList<>(Arrays.asList(portManagementCommand(devicePort, enabled)));
     SwitchActionResponse.Builder response = SwitchActionResponse.newBuilder();
     synchronized (this) {
       commandPending = true;
@@ -228,13 +242,26 @@ public class Cisco9300 extends BaseSwitchController {
   @Override
   public void connect(int devicePort, ResponseHandler<SwitchActionResponse> handler)
       throws Exception {
-    managePort(devicePort, handler, true);
+    Queue<String> commands = new LinkedList<>(Arrays.asList(portToggleCommand(devicePort, true)));
+    managePort(devicePort, commands, handler);
   }
 
   @Override
   public void disconnect(int devicePort, ResponseHandler<SwitchActionResponse> handler)
       throws Exception {
-    managePort(devicePort, handler, false);
+    Queue<String> commands = new LinkedList<>(Arrays.asList(portToggleCommand(devicePort, false)));
+    managePort(devicePort, commands, handler);
+  }
+
+  @Override
+  public void setSpeed(int devicePort, int speed, ResponseHandler<SwitchActionResponse> handler)
+      throws Exception {
+    String speedString = String.valueOf(speed);
+    if (speed == -1) {
+      speedString = "auto";
+    }
+    Queue<String> commands = new LinkedList<>(Arrays.asList(portSpeedCommand(devicePort, speedString)));
+    managePort(devicePort, commands, handler);
   }
 
   private InterfaceResponse buildInterfaceResponse(Map<String, String> interfaceMap, String raw) {

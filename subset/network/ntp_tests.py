@@ -99,7 +99,6 @@ def test_ntp_update():
             local_ntp_packets.append(packet)
     if not using_local_server or len(local_ntp_packets) < 2:
         add_summary("Device clock not synchronized with local NTP server.")
-        return 'fail'
     # Obtain the latest NTP poll
     p1 = p2 = p3 = p4 = None
     for i in range(len(local_ntp_packets)):
@@ -123,7 +122,7 @@ def test_ntp_update():
             else:
                 p3 = local_ntp_packets[i]
     if p1 is None or p2 is None:
-        add_summary("Device clock not synchronized with local NTP server.")
+        add_summary("Not enough packets to fully synchronize.")
         return 'fail'
     t1 = ntp_payload(p1).sent
     t2 = ntp_payload(p1).time
